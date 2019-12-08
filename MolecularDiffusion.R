@@ -7,11 +7,12 @@
 #  Model Parameters
 ##########################
 library(ggplot2)
+library(cowplot)
 
 # Parameters
 ############
-N = 40           # array size
-J = 1           # interaction strength
+N = 500           # array size
+diffusionSteps = 1000
 conv.eq = 500   # convergence to equilibrium
 conv = 500      # measurements
 reInit = FALSE  # re-initialize for new temperature
@@ -20,74 +21,75 @@ path.DATA = 'data'
 
 
 # Monte Carlo Step
-mcstep <- function() {
-  
+molDiffusion <- function(x,y) {
+  steps=0
+  while(steps<diffusionSteps) {
+    nb=mol[(x %% N)+1,y] + mol[((x-2) %% N)+1,y] + 
+      mol[x,(y %% N)+1] + mol[x,((y-2) %% N)+1] 
+    if(nb>0) break
+    # otherwise do a diffusion step
+    if (runif(1)>0.5) { 
+      x = ((x+round(runif(1,0,1))*2) %% N) + 1
+    } 
+    if (runif(1)>0.5) { #else {
+      y = ((y+round(runif(1,0,1))*2 ) %% N) + 1
+    }
+    steps=steps+1
+  }
+  mol[x,y] <<- 1
 }
+
+# adding one molecule
+molAdd <- function() {
+  if (sum(mol)>N*N) break
+  while(1) {
+    x=round(runif(1,min=1,max=N))
+    y=round(runif(1,min=1,max=N))
+    if(mol[x,y]==0) break
+  }
+  molDiffusion(x,y)
+}
+
+rasterGraph <- function(N, spinMatrix) {
+  df = expand.grid(x = 1:N, y = 1:N)
+  df$spin = as.vector(spinMatrix)
+  ggplot(df, aes(x,y, fill=spin)) + geom_raster() + 
+    scale_x_continuous(expand=c(0,0))+
+    scale_fill_gradientn(colors=c("red","blue"))+
+    scale_y_continuous(expand=c(0,0))+
+    theme_bw() + theme(legend.position='none')
+}
+
 
 
 # Array Initialization
 ######################
-mol = matrix(data=sign(runif(N*N)-0.5), nrow=N)
-
-# Sample Output
-###############
-rasterGraph(spin)
-ggsave(file.path(path.FIGS,paste0('Ising1D-',N,'x',N,'-Random.png')), width=4,height=4,dpi=220)
-computeIsing1DRand(conv.eq*N*N, J, 1/2.2)
-totalEnergy(N,J)
-rasterGraph(spin)
-ggsave(file.path(path.FIGS,paste0('Ising1D-',N,'x',N,'-Domains.png')), width=4,height=4,dpi=220)
-
-# Computation Intesive Part: M vs T
-##################################
-d.runTime = data.frame(N,J,conv.eq,conv, reInit, date=Sys.Date(), 
-                       start.time=as.numeric(Sys.time()),
-                       end.time=0,diff.s=0)
-bSeq = 1/TSeq
-result = data.frame()
-for(b in bSeq) {
-  print(paste("Temp: ",1/b))
-  if (reInit) { spin = matrix(data=sign(runif(N*N)-0.5), nrow=N) }
-  computeIsing1DRand(conv.eq*N*N, J, b)
-  Mavg = 0
-  M2avg = 0
-  for(i in 1:conv) {
-    computeIsing1DRand(N*N, J, b)
-    Ms = sum(spin)
-    Mavg = Mavg + Ms
-    M2avg = M2avg + Ms*Ms
+mol = matrix(data=0, nrow=N, ncol=N)
+for(i in 1:(N/2)) {
+  for(j in 1:N) {
+    molAdd()
   }
-  result = rbind(result, data.frame(b, conv, Mavg, M2avg,
-                                    T.J = 1/b/J,
-                                    chi=(M2avg/(conv*N*N) - Mavg*Mavg/(conv*conv*N*N))*b))
+  # Sample Output
+  ###############
+  #print(rasterGraph(N,mol))
+  #sum(mol)
+  #Sys.sleep(0.1)
 }
 
-# save timing
-d.runTime$end.time = as.numeric(Sys.time())
-d.runTime$diff.s = d.runTime$end.time-d.runTime$start.time
-d.runTime$type = '1D'
-d.runTime$step = TSeq[2]-TSeq[1]
-d.runTime$TempStart = TSeq[1]
-d.runTimeAll = rbind(d.runTimeAll,d.runTime)
-write.csv(d.runTimeAll,file=file.runTime,row.names = FALSE)
 
-# Graphing of Data
-##################
-ggplot(result, aes(T.J, abs(Mavg)/(conv*N*N))) +
-  geom_point(col='red', size=2) + 
-  ggtitle(paste('N=',N,'x',N,' conv=',conv, ' reInit=',reInit)) + 
-  xlab('T/J') +
-  ylab('|M|') +
-  theme_bw()
-ggsave(file.path(path.FIGS,paste0('Ising1D-',N,'x',N,'-c',conv,'.png')), width=4, height=3, dpi=220)
-write.csv(result,file.path(path.DATA,paste0('Ising1D-',N,'x',N,'-c',conv,'.csv')), row.names=FALSE)
+theme_georgia <- function(...) {
+  theme_gray(base_family = "Georgia", ...) + 
+    theme(plot.title = element_text(face = "plain"))
+}
 
-ggplot(result, aes(T.J, chi)) +
-  geom_smooth(span=0.2)+
-  geom_point(col='red', size=2) + 
-  ggtitle(paste('N=',N,'x',N,' conv=',conv, ' reInit=',reInit)) + 
-  xlab('T/J') +
-  ylab(expression(paste(chi))) +
-  theme_bw()
-ggsave(file.path(path.FIGS,paste0('Ising1D-',N,'x',N,'-c',conv,'-Chi.png')), width=4, height=3, dpi=220)
+g1 = rasterGraph(N,mol)
+title_theme <- ggdraw() +
+  draw_label(paste("Molecule Diffusion Simulation : \nN:",N,'x',N,"  Diffusion: ",diffusionSteps), 
+             fontfamily = theme_georgia()$text$family, 
+             fontface = theme_georgia()$plot.title$face, x = 0.05, hjust = 0)
+  
+plot_grid(title_theme,g1, ncol = 1, rel_heights = c(0.15, 1))
+ggsave(file.path(path.FIGS,paste0('MolDiff-Side-',N,'x',N,'-D',diffusionSteps,'.png')), 
+       width=4, height=4, dpi=300)
+
 

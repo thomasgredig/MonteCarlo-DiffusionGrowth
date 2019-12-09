@@ -8,13 +8,12 @@
 ##########################
 library(ggplot2)
 library(cowplot)
+source('hhcf.func.R')
 
 # Parameters
 ############
-N = 500           # array size
-diffusionSteps = 1000
-conv.eq = 500   # convergence to equilibrium
-conv = 500      # measurements
+N = 100           # array size
+diffusionSteps = 200
 reInit = FALSE  # re-initialize for new temperature
 path.FIGS = 'images'
 path.DATA = 'data'
@@ -69,13 +68,9 @@ for(i in 1:(N/2)) {
   for(j in 1:N) {
     molAdd()
   }
-  # Sample Output
-  ###############
-  #print(rasterGraph(N,mol))
-  #sum(mol)
-  #Sys.sleep(0.1)
 }
 
+q = hhcf(mol, 1e3)
 
 theme_georgia <- function(...) {
   theme_gray(base_family = "Georgia", ...) + 

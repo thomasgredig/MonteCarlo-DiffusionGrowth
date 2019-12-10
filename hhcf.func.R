@@ -13,8 +13,6 @@ hhcf <- function(m, NUM.ITER, bins) {
   py2 = round(runif(NUM.ITER, min=1, max=dimy))
   
   r = sqrt( (px2-px1)^2 + (py2-py1)^2 )
-  cut(r,)
-  ? cut
   g=rep(0,NUM.ITER)
   for(i in 1:NUM.ITER) {
     g[i] = (m[px1[i],py1[i]] - m[px2[i],py2[i]])^2

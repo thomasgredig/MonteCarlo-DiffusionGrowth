@@ -19,3 +19,9 @@ We have discussed the merits of [height-height correlation function to determine
 
 ![Correlation Length Fit](images/MolDiff-Side-400x400-D2000-CorrLen.png)
 
+In order to limit the correlation length fit standard deviation to about 3%, at least 5 million iterations for the HHCF are needed for a 400x400 grid, see `test.hhcf.R`. The correlation length dependence with iterations for 3 different diffusion lengths are shown here:
+
+![Correlation length versus number of iterations](images/test.hhcf-400x400-HHCF1000.png)
+
+## Grain Size Dependence on Diffusion Steps
+

@@ -3,7 +3,7 @@ library(ggplot2)
 library(cowplot)
 source('hhcf.func.R')
 source('func.R')
-
+path.FIGS = 'images'
 # Parameters
 ############
 N = 400           # array size
@@ -44,5 +44,20 @@ for(NUM.ITER in c(5:100*1e5)) {
   print(paste0("iter=", NUM.ITER))
 }
 plot(r$num, r$xi)
-ggplot(r, aes(num, xi)) + 
-  geom_point(col='red')
+
+r$diffusionSteps = factor(r$diffusionSteps)
+write.csv(r, file.path('data','test.hhcf.results.csv'), row.names=FALSE)
+
+ggplot(r, aes(num/1e6, xi, color=diffusionSteps)) + 
+  geom_point(size=2) +
+  geom_errorbar(aes(ymin=xi-xi.sd, ymax=xi+xi.sd)) + 
+  scale_x_continuous(breaks=0:5*2) + 
+  ylab(expression(paste(xi))) +
+  theme_bw() +
+  xlab(expression(paste('number of iterations (10'^6,')')))
+ggsave(file.path(path.FIGS,paste0('test.hhcf-',N,'x',N,'-HHCF',diffusionSteps,'.png')), 
+       width=6, height=4, dpi=300)
+
+ggplot(r, aes(num/1e6, xi.sd/xi*100, color=diffusionSteps)) + 
+  geom_point() + theme_bw() +
+  scale_y_continuous(limits=c(0,13))

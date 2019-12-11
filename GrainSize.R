@@ -59,5 +59,5 @@ ggplot(r, aes(sqrt(diffusionSteps),xi)) +
   theme_bw() +
   xlab(expression(paste('square root of diffusion steps (D'^0.5,')')))
 ggsave(file.path(path.FIGS,paste0('GrainSize-',N,'x',N,'-HHCF',diffusionSteps,'.png')),
-       width=6, height=4, dpi=300)
+       width=4, height=3, dpi=300)
 

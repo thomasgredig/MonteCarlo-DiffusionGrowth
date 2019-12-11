@@ -27,5 +27,5 @@ In order to limit the correlation length fit standard deviation to about 3%, at 
 
 The correlation length roughly scales with the square root of diffision steps, see
 
-![Correlation Length vs. Diffusion Steps](images/GrainSize-100x100-HHCF100.png)
+![Correlation Length vs. Diffusion Steps](images/GrainSize-100x100-HHCF1000.png)
 

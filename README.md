@@ -17,5 +17,5 @@ Here are two images generated for a 200x200 cluster size with diffusion 10 and 1
 
 We have discussed the merits of [height-height correlation function to determine grain size](https://iopscience.iop.org/article/10.1088/1742-6596/417/1/012069/pdf), so we are applying this method to these images.
 
-
+![Correlation Length Fit](images/MolDiff-Side-400x400-D2000-CorrLen.png)
 

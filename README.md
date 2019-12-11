@@ -23,5 +23,9 @@ In order to limit the correlation length fit standard deviation to about 3%, at 
 
 ![Correlation length versus number of iterations](images/test.hhcf-400x400-HHCF1000.png)
 
-## Grain Size Dependence on Diffusion Steps
+## Correlation Length Dependence on Diffusion Steps
+
+The correlation length roughly scales with the square root of diffision steps, see
+
+![Correlation Length vs. Diffusion Steps](images/GrainSize-100x100-HHCF100.png)
 

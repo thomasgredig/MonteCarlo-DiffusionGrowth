@@ -17,16 +17,35 @@ molDiffusion <- function(x,y) {
   mol[x,y] <<- 1
 }
 
+# Monte Carlo Step
+molDiffusionLeftRight <- function(x,y) {
+  steps=0
+  while(steps<diffusionSteps) {
+    nb=mol[(x %% N)+1,y] + mol[((x-2) %% N)+1,y] + 
+      mol[x,(y %% N)+1] + mol[x,((y-2) %% N)+1] 
+    if(nb>0) break
+    # otherwise do a diffusion step
+    if (runif(1)>0.5) { 
+      x = ((x+round(runif(1,0,1))*2) %% N) + 1
+    } else {
+      y = ((y+round(runif(1,0,1))*2 ) %% N) + 1
+    }
+    steps=steps+1
+  }
+  mol[x,y] <<- 1
+}
+
 # adding one molecule
-molAdd <- function() {
+molAdd <- function(typeLeftRight = TRUE) {
   if (sum(mol)>N*N) break
   while(1) {
     x=round(runif(1,min=1,max=N))
     y=round(runif(1,min=1,max=N))
     if(mol[x,y]==0) break
   }
-  molDiffusion(x,y)
+  if (typeLeftRight) { molDiffusion(x,y) } else { molDiffusionLeftRight(x,y) }
 }
+
 
 # rastering graph
 rasterGraph <- function(N, spinMatrix) {

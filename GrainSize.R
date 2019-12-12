@@ -19,7 +19,7 @@ for(diffusionSteps in diffusionSteps.list) {
   mol = matrix(data=0, nrow=N, ncol=N)
   for(i in 1:(N/2)) {
     for(j in 1:N) {
-      molAdd()
+      molAdd(typeLeftRight=FALSE)
     }
   }
 
@@ -48,7 +48,7 @@ for(diffusionSteps in diffusionSteps.list) {
 }
 plot(r$diffusionSteps, r$xi)
 
-write.csv(r, file.path(path.RESULTS,'GrainSize.results.csv'), row.names=FALSE)
+write.csv(r, file.path(path.RESULTS,'GrainSize.results.lf.csv'), row.names=FALSE)
 
 ggplot(r, aes(sqrt(diffusionSteps),xi)) +
   geom_point(size=3) +

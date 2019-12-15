@@ -48,11 +48,17 @@ for(diffusionSteps in diffusionSteps.list) {
 }
 plot(r$diffusionSteps, r$xi)
 
-write.csv(r, file.path(path.RESULTS,'GrainSize.results.lf.csv'), row.names=FALSE)
+r1 = read.csv(file.path(path.RESULTS,'GrainSize.results.csv'))
+r1$type = 'diagonal'
+r$type = 'left-right'
+r2 = rbind(r1,r)
 
-ggplot(r, aes(sqrt(diffusionSteps),xi)) +
-  geom_point(size=3) +
-  geom_point(size=2, col='red') +
+
+write.csv(r2, file.path(path.RESULTS,'GrainSize.results.csv'), row.names=FALSE)
+
+ggplot(r2, aes(sqrt(diffusionSteps),xi, col=type)) +
+  geom_point(size=3, col='black') +
+  geom_point(size=2) +
   scale_x_continuous(limits=c(0,35)) + 
   scale_y_continuous(limits=c(0,7)) + 
   ylab(expression(paste(xi))) +
